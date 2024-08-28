@@ -1,5 +1,0 @@
-l = float(input('Enter Length of Cuboid '))
-b = float(input('Enter Breadth of Cuboid '))
-h = float(input('Enter Height of Cuboid '))
-Surface = 2 * (l * h + l * b + b * h)
-print('Total Surface of Cuboid ' , Surface )
