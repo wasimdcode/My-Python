@@ -1,0 +1,6 @@
+# it is a Example of Nested loop
+for i in range(0,5):
+    for j in range(0,5):
+        if i <= j:
+            print('*', end=' ')
+    print('')
