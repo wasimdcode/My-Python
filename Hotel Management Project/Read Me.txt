@@ -1,0 +1,81 @@
+WOYO - Hotel Booking App
+
+WOYO is a simple hotel booking software made using Python.
+It helps users to book a hotel room, fill in their details, and save the booking information. This is a student project created for learning purposes.
+
+Features :-
+
+- Simple and clean user interface
+
+-Form to enter guest and room details
+
+-Shows booking summary after form is submitted
+
+-Generates a QR code with guest details
+
+-Saves booking as a PDF or text file
+
+-No internet or database needed
+
+-Tools and Libraries Used
+
+-Python (main language)
+
+-Tkinter (for GUI)
+
+-Pillow (for image handling)
+
+-qrcode (to make QR code)
+
+-reportlab (to save PDF)
+
+How to Use :-
+
+Open the program.
+
+Fill out the form with your name, phone, email, and booking details.
+
+Fill Payment details 
+
+Clikc on "Make Payment" Button
+
+It will show you a QR Code you have scan that QR
+
+Now Click on "I Have Payed" Button
+
+Now you are able to Sumbit Your Booking
+
+Click on "Submit Booking" Button.
+
+It will show your booking summary in a new window.
+
+You can save the booking as a PDF or text file.
+
+The QR code has all your booking info and can be scanned.
+
+How to Run
+
+If you have the .exe file:
+
+Just double-click the file to run the program.
+
+If you have the Python source code:
+
+Open the folder in your computer.
+
+Make sure Python is installed.
+
+Open terminal and type:
+
+pip install -r requirements.txt
+python first.py
+
+About the Project
+
+This project was made by Wasim, a student of Chandigarh University and IICS. It was built to learn Python and GUI development. The goal is to make a working desktop app that can be shared and explained to others.
+
+Note
+
+This is a beginner-level project and made only for practice. It does not connect to a real hotel database or server.
+
+Thank you for checking out this project! 😊
