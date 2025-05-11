@@ -33,7 +33,6 @@ This project helped me understand:
 If you're using the `.exe` version:
 1. Just double-click the `WOYO.exe` file  
 2. No need to install Python 🐍  
-3. Make sure the `wOYO.png` logo is in the same folder (important!)
 
 If you're using the Python version:
 ```bash
@@ -41,11 +40,15 @@ python first.py
 ```
 
 💾 Files Included
-- `first.py` – Main GUI code  
-- `Second.py` – Backend functions  
-- `wOYO.png` – Logo for the app  
+- `WOYO.exe` – Final executable version
+- `first.py` – Main Entrance code  
+- `Second.py` – Form Page and Backend functions  
+- `wOYO.png` – Entrance Image Which is Used In Entrance Page
+- `form.png` – Background Image Which is Used in Form Page
+- `qr.png` – QR code Image for Payment Window
+- `click.wav` – Sound File for Click Sound (All the Buttons)
+- `select.wav` – Sound File for Click Sound (Show Password)
 - `README.txt` – (This file you're reading!)  
-- `WOYO.exe` – Final executable version (if built)
 
 😎 Why WOYO?
 Well... I wanted to build something cool for my **Python project** — and I thought, "why not a hotel booking app?" It's a great way to learn about real-world input handling, data display, file creation, and a bit of design too. 🌟
@@ -53,7 +56,7 @@ Well... I wanted to build something cool for my **Python project** — and I tho
 Also, it’s My Dream to Create a Software By Myself and made with ✨ love, bugs, and caffeine ✨.
 
 🤝 Credits
-Made with 💖 by **Wasim** – A student, dreamer, and future software engineer 🚀
+Made with 💖 by **Wasim Turk** – A student, dreamer, and future software engineer 🚀
 
 🧾 Extra Notes
 - This app doesn’t connect to a real hotel 😅  
