@@ -7,7 +7,20 @@ from tkinter import ttk
 from PIL import Image, ImageTk
 # This is our Form Page it's imported for Accessing that file
 import Second
+import sys, os
 
+def resource_path(relative_path):
+    """
+    Get the absolute path to a resource, whether running in P y
+    or as a PyInstaller bundle.
+    """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 # For Coming Back from Form Window by Using this function
 def Entrance():
@@ -25,7 +38,8 @@ def Entrance():
 
     # This is Used For Entrance Background
     # For Accessing Image
-    img = Image.open("wOYO.png")
+    img_path = resource_path("wOYO.png")
+    img = Image.open(img_path)
     # For Resize Image
     img = img.resize((1500,750))
     # Convet PIL image to Tkinter format

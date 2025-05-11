@@ -31,16 +31,31 @@ from tkinter import messagebox as mb # Pre-made Dialog boxes
 
 # Misc
 import random # Random Number Generation
+import sys, os
 
+def resource_path(relative_path):
+    """
+    Get the absolute path to a resource, whether running in P y
+    or as a PyInstaller bundle.
+    """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 payment_done = False
 booking_id = f"WY{random.randint(100000, 999999)}"
 
 # For Creating Click Sound When Clicked on Buttons
 def click_sound():
-                winsound.PlaySound("click.wav", winsound.SND_FILENAME | winsound.SND_ASYNC)
+                click_sound_path = resource_path("click.wav")
+                winsound.PlaySound(click_sound_path, winsound.SND_FILENAME | winsound.SND_ASYNC)
 # For Show Password Click 
 def selectsound():
-                winsound.PlaySound("select.wav", winsound.SND_FILENAME | winsound.SND_ASYNC)
+                click_sound_path = resource_path("select.wav")
+                winsound.PlaySound(click_sound_path, winsound.SND_FILENAME | winsound.SND_ASYNC)
 
 # Main Form Where All the Logic Behind Form's UI and Validation written
 def Form():
@@ -51,7 +66,6 @@ def Form():
         form = tk.Tk()
         form.title("WOYO BOOKING FORM")
         form.geometry("1100x800+50+20")
-        form.resizable(0,0)
         form.configure(background='#fdd36e')
 
         # For Back Button
@@ -61,7 +75,8 @@ def Form():
                 first.Entrance()
         
         # Image Used For Making Form More Attractive
-        imgf = Image.open("form.png")
+        img_path = resource_path("form.png")
+        imgf = Image.open(img_path)
         imgf = imgf.resize((650,800))
         logo = ImageTk.PhotoImage(imgf)
         logo_label = tk.Label(form, image=logo, border=0)
@@ -734,9 +749,10 @@ def Form():
                         tk.Label(qr_window, text="Scan this QR to Pay", font=("Bahnschrift SemiBold", 14), fg="white",bg="black").pack(pady=10)
 
                         # Load and display QR image
-                        qr_img = PhotoImage(file="qr.png")
-                        qr_label = tk.Label(qr_window, image=qr_img, bg="black")
-                        qr_label.image = qr_img  # Keep a reference to avoid garbage collection
+                        pil_qr = Image.open(resource_path("qr.png"))
+                        tk_qr = ImageTk.PhotoImage(pil_qr)
+                        qr_label = tk.Label(qr_window, image=tk_qr, bg="black")
+                        qr_label.image = tk_qr   # keep a reference so it isn’t garbage-collected
                         qr_label.pack(pady=5)
 
                         # This is a fake payment complete message show up when clicked on button
