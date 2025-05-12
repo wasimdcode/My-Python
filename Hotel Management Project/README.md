@@ -48,6 +48,7 @@ python first.py
 - `qr.png` – QR code Image for Payment Window
 - `click.wav` – Sound File for Click Sound (All the Buttons)
 - `select.wav` – Sound File for Click Sound (Show Password)
+- `w.png` – Icon for my Software  
 - `README.txt` – (This file you're reading!)  
 
 😎 Why WOYO?

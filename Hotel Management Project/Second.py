@@ -1,6 +1,5 @@
 # This is the Form Page where all the main work is done
 # Core Python
-import datetime 
 from datetime import datetime
 import io  
 from tkcalendar import DateEntry# Date/Time Operations Used For Check-In Check-Out Field
@@ -8,8 +7,7 @@ import re # Regular Expression for text Pattern Matching (E-mail Checking)
 
 # GUI development
 import tkinter as tk #Main Tkinter module
-from tkinter import END,BooleanVar,Checkbutton,filedialog,ttk,Toplevel, PhotoImage # Tkinter components
-import tkinter.filedialog as filedialog
+from tkinter import END,BooleanVar,Checkbutton,filedialog,ttk,Toplevel# Tkinter components
 from tkcalendar import DateEntry # Calendar widget for Dates
 
 # Image Handling
@@ -24,6 +22,7 @@ import textwrap # Text formattin for PDFs
 
 # System/OS specific
 import winsound # Windows sound effects
+import sys, os
 
 # Application modules
 import first # Custom module (GUI entrance screen)
@@ -31,18 +30,18 @@ from tkinter import messagebox as mb # Pre-made Dialog boxes
 
 # Misc
 import random # Random Number Generation
-import sys, os
 
 def resource_path(relative_path):
     """
-    Get the absolute path to a resource, whether running in P y
+    Get the absolute path to a resource, whether running as a script
     or as a PyInstaller bundle.
     """
-    try:
-        # PyInstaller creates a temp folder and stores path in _MEIPASS
+    if getattr(sys, '_MEIPASS', False):
+        # PyInstaller creates a temp folder and stores resources in _MEIPASS
         base_path = sys._MEIPASS
-    except AttributeError:
-        base_path = os.path.abspath(".")
+    else:
+        # In normal Python execution, use the directory of this script
+        base_path = os.path.dirname(os.path.abspath(__file__))
 
     return os.path.join(base_path, relative_path)
 payment_done = False
@@ -65,7 +64,28 @@ def Form():
         # Starting of Window
         form = tk.Tk()
         form.title("WOYO BOOKING FORM")
-        form.geometry("1100x800+50+20")
+        # Load the PNG icon via resource_path()
+        icon_path = resource_path("w.png")
+        icon_img = Image.open(icon_path)
+        icon_photo = ImageTk.PhotoImage(icon_img)
+
+        # Set the window icon
+        form.iconphoto(True, icon_photo)
+        # Get screen dimensions
+        screen_width = form.winfo_screenwidth()
+        screen_height = form.winfo_screenheight()
+
+        # Use 80% of screen for app size
+        app_width = int(screen_width * 0.9)
+        app_height = int(screen_height * 0.9)
+
+        # Center the window
+        x = int((screen_width / 2) - (app_width / 2))
+        y = int((screen_height / 2) - (app_height / 2))
+
+        # Set dynamic window size and position
+        form.geometry(f"{app_width}x{app_height}+{x}+{y}")
+
         form.configure(background='#fdd36e')
 
         # For Back Button
@@ -77,13 +97,13 @@ def Form():
         # Image Used For Making Form More Attractive
         img_path = resource_path("form.png")
         imgf = Image.open(img_path)
-        imgf = imgf.resize((650,800))
+        imgf = imgf.resize((700,900))
         logo = ImageTk.PhotoImage(imgf)
         logo_label = tk.Label(form, image=logo, border=0)
         logo_label.place(x=470, y=-1)
         
         # Frame Used like a Box that Hold Related Fields
-        formFrame = tk.LabelFrame(form, text="PERSONAL DETAILS", bg="#fdd36e",padx=54, pady=20, font=("Bahnschrift", 10, 'bold', 'underline'),bd=3, relief=tk.SUNKEN) 
+        formFrame = tk.LabelFrame(form, text="PERSONAL DETAILS", bg="#fdd36e",padx=53, pady=20, font=("Bahnschrift", 10, 'bold', 'underline'),bd=3, relief=tk.SUNKEN) 
         formFrame.place(x=50, y=20)
 
         # Fullname Field and Entry
@@ -138,7 +158,7 @@ def Form():
         # Checkbox of Show Password
         show_pass = BooleanVar()
         show_passE = Checkbutton(frame2, text="Show Password", variable=show_pass, command=lambda:[toggle_password(),selectsound()], bg='#fdd36e', fg='black',font=("Bahnschrift", 10, 'bold',))
-        show_passE.place(x=110, y=70)
+        show_passE.place(x=110, y=69)
         
         # This is Third Frame for Hotel Booking Details
         frame3 = tk.LabelFrame(form, text="BOOKING DETAILS", bg="#fdd36e",padx=35, pady=20, font=("Bahnschrift", 10, 'bold', 'underline'),bd=3, relief=tk.SUNKEN)
@@ -153,7 +173,7 @@ def Form():
         # Check-In Date Field and Entry By Using DateEntry function That shows Calender for Selecting Calender
         CheckInL = ttk.Label(frame3, text="Check In Date : ",font=("Bahnschrift SemiBold", 12, "bold"),background='#fdd36e')
         CheckInL.grid(row=1, column=0, sticky='w')
-        CheckInE = DateEntry(frame3, date_pattern='dd/mm/yyyy',width=19,font=('Consolas', 10))
+        CheckInE = DateEntry(frame3, date_pattern='dd/mm/yyyy',mindate=datetime.today(),width=19,font=('Consolas', 10))
         CheckInE.grid(row=1, column=1)
 
         # Check-In Date Field and Entry By Using DateEntry function That shows Calender for Selecting Calender
@@ -196,16 +216,9 @@ def Form():
                 Checkin = CheckInE.get()
                 Checkout = CheckOutE.get()
                 room_type = RoomType.get()
-                location = Location.get()
                 special = SpecialReq.get("1.0", END).strip() # Start from line 1, character 0 Until the END of the text         
 
                 # Here Starts the Validation Condition
-                try:
-                        guests = int(GuestE.get()) # For Checking Guest Field is Integer or not
-                except ValueError:
-                        mb.showerror("Error", "Number of Guests must be a numeric value.") # Using Messageboxes For Giving ERROR,WARNING and INFO
-                        return
-
                 # Full Name Validation
                 if not name:
                         mb.showerror("Error", "Full Name is required.")
@@ -278,6 +291,11 @@ def Form():
                         return
                 
                 # Guests validation
+                try:
+                        guests = int(GuestE.get()) # For Checking Guest Field is Integer or not
+                except ValueError:
+                        mb.showerror("Error", "Number of Guests must be a numeric value.") # Using Messageboxes For Giving ERROR,WARNING and INFO
+                        return
                 if guests <= 0:
                         mb.showerror("Error", "Guests must be greater than 0.")
                         return
@@ -288,6 +306,7 @@ def Form():
                         mb.showerror("Error", "Only 2 guests allowed for Double room.")
                         return
 
+                
                 # Date format and logic validation
                 try:    
                         # Convert string dates to datetime objects
@@ -306,12 +325,12 @@ def Form():
                                 return
                 except ValueError:
                         # Handle format errors
-                        mb.showerror("Format Error", "Dates must be in DD/MM/YYYY format.")
+                        mb.showerror("Invalid Date", "Invalid date or format. Use DD/MM/YYYY.")
                         return
 
                 # Special request validation
-                if len(special) > 30:
-                        mb.showerror("Error", "Special request must be under 30 characters.")
+                if len(special) > 100:
+                        mb.showerror("Error", "Special request must be under 100 characters.")
                         return
                 # Check if special requests contain HTML/script tags (potential XSS attack)
                 if re.search(r'<script>|</script>|<.*?>', special, re.IGNORECASE):
@@ -319,7 +338,6 @@ def Form():
                         return # Exit function to prevent processing
                 
                 # Payment check
-                global payment_done
                 if not payment_done:
                         mb.showwarning("Payment Required", "Please complete the payment before submitting the booking.")
                         return
@@ -339,20 +357,16 @@ def Form():
                         
                 # Create a list containing formatted booking details for QR code payload
                 payload_lines = [
+                        "Thank You for Choosing WOYO!",
                         f"Booking ID: {booking_details['booking_id']}",
                         f"Name: {booking_details['full_name']}",
                         f"Phone: {booking_details['phone']}",
                         f"Email: {booking_details['email']}",
-                        f"Username: {booking_details['username']}",
                         f"Room: {booking_details['room_type']}",
                         f"Check-in: {booking_details['check_in']}",
                         f"Check-out: {booking_details['check_out']}",
                         f"Guests: {booking_details['guests']}",
                         f"Location: {booking_details['location']}",
-                        f"Request: {booking_details['special_req']}",
-                        "Thank you for choosing WOYO!",
-                        "We look forward to welcoming you soon.",
-                        "Have a wonderful day!"
                 ]
                 
                 # Combine all lines into a single string with newline separators
@@ -363,7 +377,7 @@ def Form():
                         qr = qrcode.QRCode(
                         version=None,  # Auto-select version based on data size
                         error_correction=qrcode.constants.ERROR_CORRECT_H,  # Higher error correction (30% recovery)
-                        box_size=12,   # Each QR module = 10 pixels (larger for better scanning)
+                        box_size=10,   # Each QR module = 10 pixels (larger for better scanning)
                         border=4       # 4-module quiet zone (white border)
                         )
                         
@@ -400,7 +414,7 @@ def Form():
                         text="Scan for key booking details",
                         font=("Consolas", 10, "bold"),
                         bg=display_frame.cget("bg"), 
-                        fg="white"
+                        fg="#14213D"
                         )
                         label_text.pack()
                         
@@ -435,7 +449,7 @@ def Form():
 
                 # Create a multi-line formatted string with booking details
                 data = f"""
-                Booking Summary:
+                Booking Summary:-
                 Name          : {full_name}
                 Phone         : {phone}
                 Email         : {email}
@@ -445,35 +459,45 @@ def Form():
                 Location      : {location}
                 Check-In      : {check_in}
                 Check-Out     : {check_out}
-                Special Req   : {special_req}
                 Booking ID    : {booking_id}
+                Special Req   : {special_req}
+                ! Thank you for choosing WOYO ! Have a wonderful day !
                 """
 
                 # Create a new popup window for booking summary
                 summaryWin = tk.Toplevel() # Create child window
                 summaryWin.title("Booking Summary") 
-                summaryWin.geometry("700x750+600+20")
-                summaryWin.configure(bg="grey")
+                summaryWin.geometry("800x780")  # Set size but not position
+
+                # Calculate coordinates to center the window
+                screen_width = summaryWin.winfo_screenwidth()
+                screen_height = summaryWin.winfo_screenheight()
+                x = (screen_width - 800) // 2  # 700 is the window width
+                y = (screen_height - 780) // 2 - 50 # 750 is the window height
+
+                # Set the window to center of the screen
+                summaryWin.geometry(f"+{x}+{y}")
+                summaryWin.configure(bg="#14213D")
 
                 # Create a container frame inside the summary window
-                content = tk.Frame(summaryWin, bg="grey", padx=20, pady=20, relief=tk.SUNKEN)
+                content = tk.Frame(summaryWin, bg="#14213D", padx=20, pady=20, relief=tk.SUNKEN)
                 # Pack the frame to fill and expand in window
                 content.pack(fill="both", # Expand to fill both horizontal and vertical space
                              expand=True) # Allow frame to grow if window is resized
 
                 # Title
                 tk.Label(content,
-                        text="Your Booking Details",
-                        font=("Consolas",20,"bold","underline"),
-                        fg="white", bg="grey")\
+                        text="YOUR BOOKING DETAILS",
+                        font=("Consolas",25,"bold","underline"),
+                        fg="white", bg="#14213D")\
                 .pack(pady=(0,20))
 
                 # Create a read-only text widget to display booking summary
                 txt = tk.Text(content,
                               wrap="word", # Wrap text at word boundaries
                               font=("Consolas",
-                                    10,"bold"),
-                                bg="white", height=15)
+                                    14,"bold"),
+                                bg="#FCA311",fg="black", height=15)
                 # Insert the booking data at the start ("1.0" position)
                 txt.insert("1.0", data)
                 # Disable editing to make it read-only
@@ -493,6 +517,24 @@ def Form():
                 # - No extra whitespace at start/end of lines
                 # - Preserved line breaks for formatting
 
+                # 5. Button frame
+                btn_frame = tk.Frame(summaryWin, bg="#14213D")
+                btn_frame.pack(fill="x")
+
+                # Button For Save to PDF so that user Save Summary File as PDF in 
+                tk.Button(btn_frame, text="SAVE TO PDF", bg="green", fg="white",
+                        font=("Consolas",15,"bold"),
+                        # Calls save function with current data
+                        # lambda : preserves current data when clicked
+                        command=lambda: save_to_pdf(data, booking_id))\
+                .pack(side="left", padx=10, expand=True) # Allows button to grow if needed
+
+                # Same Button But it's for Saving File as Text format
+                tk.Button(btn_frame, text="SAVE TO TEXT FILE", bg="blue", fg="white",
+                        font=("Consolas",15,"bold"),
+                        command=lambda: save_to_text(data, booking_id))\
+                .pack(side="right", padx=10, expand=True)
+
                 booking_details = {
                         'booking_id': booking_id,
                         'full_name': full_name,
@@ -508,29 +550,12 @@ def Form():
                 }
                 
                 # Create a frame for QR code
-                qr_frame = tk.Frame(summaryWin, bg="grey", bd=2, relief=tk.GROOVE)
-                qr_frame.pack(pady=15, padx=10)
+                qr_frame = tk.Frame(summaryWin, bg="#14213D", bd=5, relief=tk.GROOVE)
+                qr_frame.pack(fill="both")
                 
                 # Generate and display QR code
                 generate_booking_qr(booking_details, qr_frame)
                 
-                # 5. Button frame
-                btn_frame = tk.Frame(summaryWin, bg="grey", pady=20)
-                btn_frame.pack(fill="x")
-
-                # Button For Save to PDF so that user Save Summary File as PDF in 
-                tk.Button(btn_frame, text="Save to PDF", bg="green", fg="white",
-                        font=("Consolas",10,"bold"),
-                        # Calls save function with current data
-                        # lambda : preserves current data when clicked
-                        command=lambda: save_to_pdf(data, booking_id))\
-                .pack(side="left", padx=10, expand=True) # Allows button to grow if needed
-
-                # Same Button But it's for Saving File as Text format
-                tk.Button(btn_frame, text="Save to Text File", bg="blue", fg="white",
-                        font=("Consolas",10,"bold"),
-                        command=lambda: save_to_text(data, booking_id))\
-                .pack(side="right", padx=10, expand=True)
 
         # This is for Saving all the Booking Summary Data into a PDF file so that user can save that file
         def save_to_pdf(data, booking_id):
@@ -763,7 +788,7 @@ def Form():
                                 qr_window.destroy()
 
                         # Button for Completing payment step so that Booking will submit
-                        tk.Button(qr_window, text="I Have Paid", command=close_after_payment, bg="green", fg="white", font=("Bahnschrift", 10, "bold")).pack(pady=15)
+                        tk.Button(qr_window, text="I Have Paid", command=close_after_payment, bg="green", fg="white", font=("Bahnschrift", 20, "bold")).pack(pady=15)
                         winsound.MessageBeep()
         # Button for Opening QR code and Make the Payment Step Complete     
         MakePaymentBTN = tk.Button(form,
@@ -779,7 +804,7 @@ def Form():
                 pady=5,
                 cursor='hand2',
                 command=lambda: handle_payment())
-        MakePaymentBTN.place(x=180, y=720)
+        MakePaymentBTN.place(x=450, y=605)
         
         # This is Hover Effect
         def on_enter(e):
@@ -859,6 +884,3 @@ def Form():
         HomeBTN.place(x=765, y=40)
         
         form.mainloop()
-
-        if __name__ == "__entrance__":
-                first()
