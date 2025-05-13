@@ -68,6 +68,7 @@ def Form():
         icon_path = resource_path("w.png")
         icon_img = Image.open(icon_path)
         icon_photo = ImageTk.PhotoImage(icon_img)
+        form.resizable(0,0)
 
         # Set the window icon
         form.iconphoto(True, icon_photo)
@@ -75,9 +76,9 @@ def Form():
         screen_width = form.winfo_screenwidth()
         screen_height = form.winfo_screenheight()
 
-        # Use 80% of screen for app size
-        app_width = int(screen_width * 0.9)
-        app_height = int(screen_height * 0.9)
+        # Use 100% of screen for app size
+        app_width = int(screen_width * 1)
+        app_height = int(screen_height * 1)
 
         # Center the window
         x = int((screen_width / 2) - (app_width / 2))
@@ -93,11 +94,10 @@ def Form():
                 click_sound()
                 form.destroy()
                 first.Entrance()
-        
         # Image Used For Making Form More Attractive
         img_path = resource_path("form.png")
         imgf = Image.open(img_path)
-        imgf = imgf.resize((700,900))
+        imgf = imgf.resize((700,app_height))
         logo = ImageTk.PhotoImage(imgf)
         logo_label = tk.Label(form, image=logo, border=0)
         logo_label.place(x=470, y=-1)
@@ -106,45 +106,117 @@ def Form():
         formFrame = tk.LabelFrame(form, text="PERSONAL DETAILS", bg="#fdd36e",padx=53, pady=20, font=("Bahnschrift", 10, 'bold', 'underline'),bd=3, relief=tk.SUNKEN) 
         formFrame.place(x=50, y=20)
 
+
+        class PlaceholderEntry(tk.Entry):
+                def __init__(self, master=None, placeholder="PLACEHOLDER",
+                                placeholder_color='grey', text_color='black',
+                                show_char=None, **kwargs):
+                        """
+                        show_char: the masking character for real input (e.g. '*'), or None.
+                        """
+                        super().__init__(master, **kwargs)
+                        self.placeholder = placeholder
+                        self.placeholder_color = placeholder_color
+                        self.text_color = text_color
+                        self.show_char = show_char
+
+                        # Always start unmasked so placeholder shows clearly
+                        self.config(show='')
+
+                        # Put placeholder text
+                        self._put_placeholder()
+
+                        # Bind focus events
+                        self.bind("<FocusIn>", self._on_focus_in)
+                        self.bind("<FocusOut>", self._on_focus_out)
+
+                def _put_placeholder(self, event=None):
+                        if not self.get():
+                            self.insert(0, self.placeholder)
+                            self['fg'] = self.placeholder_color
+                        # Ensure no masking when placeholder is shown
+                            self.config(show='')
+
+                def _on_focus_in(self, event=None):
+                        # If placeholder is present, clear it
+                        if self['fg'] == self.placeholder_color:
+                                self.delete(0, tk.END)
+                                self['fg'] = self.text_color
+                        # Once user focuses in (to type), apply masking if needed
+                        if self.show_char:
+                           self.config(show=self.show_char)
+
+                def _on_focus_out(self, event=None):
+                        # If nothing was typed, re‑show placeholder
+                        if not self.get():
+                          self._put_placeholder()
+
+        class PlaceholderText(tk.Text):
+                def __init__(self, master=None, placeholder="PLACEHOLDER",
+                        color='grey', **kwargs):
+                        super().__init__(master, **kwargs)
+                        self.placeholder = placeholder
+                        self.placeholder_color = color
+                        self.default_fg = self['fg'] if 'fg' in kwargs else 'black'
+
+                        self._put_placeholder()
+                        self.bind("<FocusIn>",   self._on_focus_in)
+                        self.bind("<FocusOut>",  self._on_focus_out)
+
+                def _put_placeholder(self, event=None):
+                        if not self.get("1.0", tk.END).strip():
+                                self.insert("1.0", self.placeholder)
+                                self['fg'] = self.placeholder_color
+
+                def _on_focus_in(self, event=None):
+                        if self['fg'] == self.placeholder_color:
+                                self.delete("1.0", tk.END)
+                                self['fg'] = self.default_fg
+
+                def _on_focus_out(self, event=None):
+                        if not self.get("1.0", tk.END).strip():
+                                self._put_placeholder()
+
         # Fullname Field and Entry
         FullnameL = ttk.Label(formFrame, text="Full Name : ",font=('Bahnschrift SemiBold',12,'bold'),background='#fdd36e')
         FullnameL.grid(row=0, column=0, sticky='w') # w for west(left)
-        FullnameE = ttk.Entry(formFrame,width=20,font=('Consolas', 10))
+        FullnameE = PlaceholderEntry(formFrame,placeholder="e.g. John Doe",width=20,font=('Consolas', 10))
         FullnameE.grid(row=0, column=1) # Using Grid for Precise placement between Label and Entry
 
         # Phone Field and Entry
         PhoneL = ttk.Label(formFrame, text="Phone Number : ",font=('Bahnschrift SemiBold',12,'bold'),background='#fdd36e')
         PhoneL.grid(row=1, column=0, sticky='w')
-        PhoneE = ttk.Entry(formFrame,width=20,font=('Consolas', 10))
+        PhoneE = PlaceholderEntry(formFrame,placeholder="e.g. +91 9988112200",width=20,font=('Consolas', 10))
         PhoneE.grid(row=1, column=1)
 
         # Email Field and Entry
         EmailL = ttk.Label(formFrame, text="E-Mail : ",font=('Bahnschrift SemiBold',12,'bold'),background='#fdd36e')
         EmailL.grid(row=2, column=0, sticky='w')
-        EmailE = ttk.Entry(formFrame,width=20,font=('Consolas', 10))
+        EmailE = PlaceholderEntry(formFrame,placeholder="e.g. you@example.com",width=20,font=('Consolas', 10))
         EmailE.grid(row=2, column=1)
 
         # This is Second Frame For Acount Details
-        frame2 = tk.LabelFrame(form, text="ACOUNT DETAILS", bg="#fdd36e",padx=58, pady=25, font=("Bahnschrift", 10, 'bold', 'underline'),bd=3, relief=tk.SUNKEN)
+        frame2 = tk.LabelFrame(form, text="ACOUNT DETAILS", bg="#fdd36e",padx=68, pady=25, font=("Bahnschrift", 10, 'bold', 'underline'),bd=3, relief=tk.SUNKEN)
         frame2.place(x=50, y=150)
 
         # UserName Field Label and Entry
         UsernameL = ttk.Label(frame2, text="UserName : ",font=('Bahnschrift SemiBold',12,'bold'),background='#fdd36e')
         UsernameL.grid(row=0, column=0, sticky='w')
-        UsernameE = ttk.Entry(frame2,width=20,font=('Consolas', 10),background='black')
+        UsernameE = PlaceholderEntry(frame2, placeholder="Choose a username", width=20)
         UsernameE.grid(row=0, column=1)
 
         # Password Field Label and Entry
         PasswordL = ttk.Label(frame2, text="Password : ",font=('Bahnschrift SemiBold',12,'bold'),background='#fdd36e')
         PasswordL.grid(row=1, column=0, sticky='w')
-        PasswordE = ttk.Entry(frame2,width=20,font=('Consolas', 10),background='black',show="*")
+        PasswordE = PlaceholderEntry(frame2, placeholder="e.g,Pass@123", width=20, show='*')
         PasswordE.grid(row=1, column=1)
 
         # Confirm Password Field Label and Entry
         PassConfirmL = ttk.Label(frame2, text="Confirmation  : ",font=('Bahnschrift SemiBold',12,'bold'),background='#fdd36e')
         PassConfirmL.grid(row=2, column=0, sticky='w')
-        PassConfirmE = ttk.Entry(frame2,width=20,font=('Consolas', 10),background='black', show="*")
+        PassConfirmE = PlaceholderEntry(frame2, placeholder="Re-enter password", width=20, show='*')
         PassConfirmE.grid(row=2, column=1)
+        
 
         # Checkbox for Showing and Hidding Password 
         def toggle_password():
@@ -199,7 +271,7 @@ def Form():
         # Special Request Field and Entry for User if they wants to Give some Message when ordering a Room
         SpecialReqL = ttk.Label(frame3, text="Special Request : ",font=("Bahnschrift SemiBold", 12, "bold"),background='#fdd36e')
         SpecialReqL.grid(row=5, column=0, sticky='w')
-        SpecialReq = tk.Text(frame3, width=19, height=4) # Using Text field for Taking Input
+        SpecialReq = PlaceholderText(frame3,placeholder="Any special request? E.g. Dietary needs, accessibility requirements, preferred time/location, gift messages, or other unique preferences - we will make it happen!", width=19, height=4) # Using Text field for Taking Input
         SpecialReq.grid(row=5, column=1)
 
         # These are all the Validation Which is used in Form so that User don't Enter any Wrong Data according to Field and Entry
@@ -690,19 +762,19 @@ def Form():
         # Card Number Field Label and Entry
         CardNumL = tk.Label(frame4, text="Card/UPI Number:", bg="#fdd36e", font=("Consolas", 10, 'bold'))
         CardNumL.grid(row=3, column=0, sticky="w")
-        CardNumE = tk.Entry(frame4, width=15)
+        CardNumE = PlaceholderEntry(frame4, placeholder="8 or 16 Digits",width=15)
         CardNumE.grid(row=3, column=1, padx=5)
 
         # Expiry Date Field Label and Entry
         ExpiryDateL = tk.Label(frame4, text="Expiry Date (MM/YY):", bg="#fdd36e", font=("Consolas", 10, 'bold'))
         ExpiryDateL.grid(row=4, column=0, sticky="w")
-        ExpiryDateE = tk.Entry(frame4, width=15)
+        ExpiryDateE = PlaceholderEntry(frame4,placeholder="MM/YY", width=15)
         ExpiryDateE.grid(row=4, column=1,sticky="w", padx=5)
 
         # CVV Field Label and Entry
         CvvL = tk.Label(frame4, text="CVV:", bg="#fdd36e", font=("Consolas", 10, 'bold'))
         CvvL.grid(row=5, column=0, sticky="w")
-        CvvE = tk.Entry(frame4, width=15, show="*")
+        CvvE = PlaceholderEntry(frame4,placeholder="CVV 3 Digits", width=15, show="*")
         CvvE.grid(row=5, column=1,sticky="w", padx=5)
         
         # This is for Button That Clear All Entry fields when Clicked on it
@@ -741,7 +813,137 @@ def Form():
             card = CardNumE.get().strip()
             expiry = ExpiryDateE.get().strip()
             cvv = CvvE.get().strip()
+            name = FullnameE.get().strip()
+            phone = PhoneE.get().strip()
+            email = EmailE.get().strip()
 
+            username = UsernameE.get().strip()
+            password = PasswordE.get()
+            confirm = PassConfirmE.get()
+
+            Checkin = CheckInE.get()
+            Checkout = CheckOutE.get()
+            room_type = RoomType.get()
+            special = SpecialReq.get("1.0", END).strip() # Start from line 1, character 0 Until the END of the text         
+
+            # Here Starts the Validation Condition
+            # Full Name Validation
+            if not name:
+                mb.showerror("Error", "Full Name is required.")
+                return
+
+            # Allow letters, spaces, apostrophes, hyphens
+            if not re.match(r"^[A-Za-z\s'-]+$", name): #Using Regular Expression
+                mb.showerror("Error", "Full Name must contain only letters, spaces, hyphens (-), or apostrophes (').")
+                return
+            if len(name) < 2:
+                mb.showerror("Error", "Full Name must be at least 2 characters long.")
+                return
+
+            # Phone Number Validation
+            if not phone:
+                mb.showerror("Error", "Phone Number is required.")
+                return
+            # Accept formats like +911234567890 or 1234567890
+            if not re.match(r"^\+?\d{10,15}$", phone):
+                mb.showerror("Error", "Phone Number must be 10-15 digits, optionally starting with '+'.")
+                return
+
+            # Email Validation
+            if not email:
+                mb.showerror("Error", "Email is required.")
+                return
+
+            # Basic email pattern: something@domain.com
+            if not re.match(r"^[\w\.-]+@[\w\.-]+\.\w{2,4}$", email):
+                mb.showerror("Error", "Enter a valid email address.")
+                return
+
+            # Username validation
+            if not username:
+                mb.showerror("Error", "Username is required.")
+                return
+            if len(username) < 4:
+                mb.showerror("Error", "Username must be at least 4 characters long.")
+                return
+            if not re.match(r'^[A-Za-z0-9_]+$', username):
+                mb.showerror("Error", "Username can only contain letters, numbers, and underscores (_). No spaces or symbols.")
+                return
+
+            # Password validation
+            if not password:
+                mb.showerror("Error", "Password is required.")
+                return
+            if len(password) < 8:
+                mb.showerror("Error", "Password must be at least 8 characters long.")
+                return
+            if ' ' in password:
+                mb.showerror("Error", "Password cannot contain spaces.")
+                return
+            if not re.search(r'[A-Z]', password): # Using Search 
+                mb.showerror("Error", "Password must contain at least one uppercase letter.") 
+                return
+            if not re.search(r'[a-z]', password):
+                mb.showerror("Error", "Password must contain at least one lowercase letter.")
+                return
+            if not re.search(r'\d', password):
+                mb.showerror("Error", "Password must contain at least one digit.")
+                return
+            if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+                mb.showerror("Error", "Password must contain at least one special character.")
+                return
+
+            # Confirm password
+            if password != confirm:
+                mb.showerror("Error", "Passwords do not match.")
+                return
+
+            # Guests validation
+            try:
+                guests = int(GuestE.get()) # For Checking Guest Field is Integer or not
+            except ValueError:
+                mb.showerror("Error", "Number of Guests must be a numeric value.") # Using Messageboxes For Giving ERROR,WARNING and INFO
+                return
+            if guests <= 0:
+                mb.showerror("Error", "Guests must be greater than 0.")
+                return
+            if room_type == "Single" and guests > 1:
+                mb.showerror("Error", "Only 1 guest allowed for Single room.")
+                return
+            if room_type == "Double" and guests > 2:
+                mb.showerror("Error", "Only 2 guests allowed for Double room.")
+                return
+
+
+            # Date format and logic validation
+            try:    
+            # Convert string dates to datetime objects
+                checkin_date = datetime.strptime(Checkin, "%d/%m/%Y")
+                checkout_date = datetime.strptime(Checkout, "%d/%m/%Y")
+
+                # Get today's date without time component
+                today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+
+                # Validate dates
+                if checkin_date < today:
+                        mb.showerror("Invalid Date", "Check-in date cannot be in the past.")
+                        return
+                elif checkout_date <= checkin_date:
+                        mb.showerror("Invalid Date", "Check-out date must be after check-in date.")
+                        return
+            except ValueError:
+                # Handle format errors
+                mb.showerror("Invalid Date", "Invalid date or format. Use DD/MM/YYYY.")
+                return
+
+            # Special request validation
+            if len(special) > 100:
+                mb.showerror("Error", "Special request must be under 100 characters.")
+                return
+                # Check if special requests contain HTML/script tags (potential XSS attack)
+            if re.search(r'<script>|</script>|<.*?>', special, re.IGNORECASE):
+                mb.showerror("Error", "Special request contains unsafe text.") # Show security warning
+                return # Exit function to prevent processing
             if not card or not expiry or not cvv:
                     mb.showerror("Validation Error", "All payment fields are required.")
                     return False
@@ -791,20 +993,30 @@ def Form():
                         tk.Button(qr_window, text="I Have Paid", command=close_after_payment, bg="green", fg="white", font=("Bahnschrift", 20, "bold")).pack(pady=15)
                         winsound.MessageBeep()
         # Button for Opening QR code and Make the Payment Step Complete     
+        def on_enter(e):
+                MakePaymentBTN['background'] = 'black'  
+                MakePaymentBTN['foreground'] = 'white'
+
+        def on_leave(e):
+                MakePaymentBTN['background'] = 'orange'       
+                MakePaymentBTN['foreground'] = 'black'
+
         MakePaymentBTN = tk.Button(form,
                 text="MAKE PAYMENT",
                 font=('Bahnschrift SemiBold', 10, 'bold'),
-                bg='green',
-                fg='white',
+                bg='orange',
+                fg='black',
                 activebackground='dark green',
                 activeforeground='white',
                 relief='raised',
                 borderwidth=3,
-                padx=10,
+                padx=13,
                 pady=5,
                 cursor='hand2',
                 command=lambda: handle_payment())
-        MakePaymentBTN.place(x=450, y=605)
+        MakePaymentBTN.bind("<Leave>", on_leave)
+        MakePaymentBTN.bind("<Enter>", on_enter)
+        MakePaymentBTN.place(x=450, y=76)
         
         # This is Hover Effect
         def on_enter(e):
@@ -831,7 +1043,7 @@ def Form():
                         command=validate_form)
         submitBTN.bind("<Enter>", on_enter)
         submitBTN.bind("<Leave>", on_leave)
-        submitBTN.place(x=500, y=40)
+        submitBTN.place(x=450, y=26)
 
         def on_enter(e):
                 ResetBTN['background'] = 'blue'  
@@ -856,7 +1068,7 @@ def Form():
                         command=clear_all_fields)
         ResetBTN.bind("<Enter>", on_enter)
         ResetBTN.bind("<Leave>", on_leave)
-        ResetBTN.place(x=650, y=40)
+        ResetBTN.place(x=600, y=26)
 
         def on_enter(e):
                 HomeBTN['background'] = 'red'  
@@ -875,12 +1087,12 @@ def Form():
                         activeforeground='white',
                         relief='raised',
                         borderwidth=3,
-                        padx=10,
+                        padx=24,
                         pady=5,
                         cursor='hand2',
                         command=backtohome)
         HomeBTN.bind("<Enter>", on_enter)
         HomeBTN.bind("<Leave>", on_leave)
-        HomeBTN.place(x=765, y=40)
+        HomeBTN.place(x=600, y=76)
         
         form.mainloop()

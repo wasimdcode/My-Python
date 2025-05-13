@@ -47,9 +47,9 @@ def Entrance():
     screen_width = entrance.winfo_screenwidth()
     screen_height = entrance.winfo_screenheight()
 
-    # Use 90% of screen for app size
-    app_width = int(screen_width * 0.9)
-    app_height = int(screen_height * 0.9)
+    # Use 100% of screen for app size
+    app_width = int(screen_width * 1)
+    app_height = int(screen_height * 1)
 
     # Center the window
     x = int((screen_width / 2) - (app_width / 2))
